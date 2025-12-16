@@ -1,13 +1,54 @@
+fetch("http://localhost:5000/api/products")
+  .then(res => res.json())
+  .then(data => {
+    console.log(data); // You will see all products from database
+  });
+
 // Price helpers
 function priceToNumber(price) {
-  if (!price) return 0;
-  return Number(String(price).replace(/[^0-9]/g, "")) || 0;
+  var i;
+  var numStr = "";
+
+  if (price == null) {
+    return 0;
+  }
+
+  price = price + "";
+
+  for (i = 0; i < price.length; i++) {
+    if (price[i] >= "0" && price[i] <= "9") {
+      numStr = numStr + price[i];
+    }
+  }
+
+  if (numStr == "") {
+    return 0;
+  }
+  return parseInt(numStr, 10);
 }
 
 function numberToPrice(num) {
-  return "₹" + Number(num).toLocaleString("en-IN");
-}
+  var str;
+  var result = "";
+  var count = 0;
+  var i;
 
+  if (num == null) {
+    return "₹0";
+  }
+  str = num + "";
+  for (i = str.length - 1; i >= 0; i--) {
+    result = str[i] + result;
+    count++;
+
+    if (count == 3 && i != 0) {
+      result = "," + result;
+      count = 0;
+    }
+  }
+
+  return "₹" + result;
+}
 
 // Cart Storage
 var cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -31,8 +72,11 @@ function updateCartCount() {
 }
 
 function clearCart() {
+  next = "Clear Products";
   cart = [];
   saveCart();
+
+  alert(next);
 }
 
 
@@ -108,9 +152,30 @@ function renderAllProducts(list) {
 
 // Escape unsafe HTML
 function escapeHtml(s) {
-  var map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-  return String(s).replace(/[&<>"']/g, function (m) { return map[m]; });
+  var result = "";
+  var i = 0;
+
+  while (i < s.length) {
+    var ch = s[i];
+
+    if (ch == "&") {
+      result = result + "&amp;";
+    } else if (ch == "<") {
+      result = result + "&lt;";
+    } else if (ch == ">") {
+      result = result + "&gt;";
+    } else if (ch == '"') {
+      result = result + "&quot;";
+    } else if (ch == "'") {
+      result = result + "&#39;";
+    } else {
+      result = result + ch;
+    }
+    i = i + 1;
+  }
+  return result;
 }
+
 
 
 // Event Delegation
